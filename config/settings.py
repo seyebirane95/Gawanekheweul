@@ -2,6 +2,7 @@ from pathlib import Path
 import os
 import dj_database_url
 from dotenv import load_dotenv
+import environ
 
 # ------------------------------
 # BASE & ENV
@@ -68,7 +69,7 @@ WSGI_APPLICATION = 'config.wsgi.application'
 # ------------------------------
 # DATABASE
 # ------------------------------
-DATABASE_URL = os.getenv('postgresql://gawanekheweul_user:5nyzuXeoW4s86022ORZWmooIbXZuyYUM@dpg-d2i7p33e5dus73ehf050-a.oregon-postgres.render.com/gawanekheweul')  # Render fournit DATABASE_URL
+DATABASE_URL = os.getenv('DATABASE_URL')  # Render fournit DATABASE_URL
 if DATABASE_URL:
     DATABASES = {
         'default': dj_database_url.parse(DATABASE_URL, conn_max_age=600)
