@@ -1,0 +1,34 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Tous les produits{% endblock %}
+
+{% block content %}
+<h1 class="mb-4">Tous les produits</h1>
+
+<div class="grid">
+  {% for p in products %}
+    <article style="border:1px solid #eee; padding:10px; border-radius:8px; text-align:center;">
+      <img src="{% if p.image_url %}{{ p.image_url }}{% else %}{% static 'img/placeholder.png' %}{% endif %}" 
+           alt="{{ p.name }}" 
+           style="width:100%;height:180px;object-fit:cover;border-radius:5px;">
+      
+      <h3 style="margin-top:10px;">
+        <a href="{% url 'product_detail' p.slug %}" style="text-decoration:none;color:#333;">
+          {{ p.name }}
+        </a>
+      </h3>
+      <p class="fw-bold text-success">{{ p.price }} FCFA</p>
+
+      <form action="{% url 'add_to_cart' p.id %}" method="post">
+        {% csrf_token %}
+        <button type="submit" style="background:#28a745;color:white;border:none;padding:8px 12px;border-radius:5px;cursor:pointer;">
+          Ajouter au panier
+        </button>
+      </form>
+    </article>
+  {% empty %}
+    <p>Aucun produit.</p>
+  {% endfor %}
+</div>
+{% endblock %}

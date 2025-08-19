@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+{% block title %}Commande réussie{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+  <div class="text-center mb-5">
+    <i class="fas fa-check-circle text-success" style="font-size:80px;"></i>
+    <h1 class="fw-bold mt-3">Merci pour votre commande 🎉</h1>
+    <p class="lead text-muted">
+      Votre commande a bien été enregistrée.<br>
+      Un email de confirmation vous a été envoyé (simulation).
+    </p>
+  </div>
+
+  <!-- Timeline -->
+  <div class="card shadow-lg border-0 p-4">
+    <h4 class="fw-bold mb-4 text-center">Suivi de votre commande</h4>
+
+    <div class="progress mb-4" style="height: 20px;">
+      <div class="progress-bar bg-success" role="progressbar" style="width: 33%;">
+        Commande reçue
+      </div>
+    </div>
+
+    <div class="row text-center">
+      <div class="col">
+        <i class="fas fa-receipt fa-2x text-success"></i>
+        <p class="mt-2">Commande reçue</p>
+      </div>
+      <div class="col">
+        <i class="fas fa-box fa-2x text-muted"></i>
+        <p class="mt-2">Préparation</p>
+      </div>
+      <div class="col">
+        <i class="fas fa-truck fa-2x text-muted"></i>
+        <p class="mt-2">Livraison</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Actions -->
+  <div class="text-center mt-5">
+    <a href="{% url 'product_list' %}" class="btn btn-primary btn-lg me-3">
+      <i class="fas fa-shopping-bag me-2"></i> Continuer mes achats
+    </a>
+    <a href="/" class="btn btn-outline-secondary btn-lg">
+      <i class="fas fa-home me-2"></i> Retour à l’accueil
+    </a>
+  </div>
+</div>
+{% endblock %}

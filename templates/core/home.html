@@ -1,0 +1,50 @@
+{% extends 'base.html' %}  {# TOUJOURS la première ligne #}
+{% load static %}           {# juste après extends #}
+
+{% block title %}Accueil {% endblock %}
+
+{% block content %}
+<h1 class="text-center my-4 fw-bold">Dalaal ak Diam Si GAWANE KHEWEUL BUSINESS</h1>
+
+<div class="container">
+  <div class="row g-4">
+    {% for p in products %}
+    <div class="col-12 col-sm-6 col-md-4 col-lg-3">
+      <div class="card h-100 shadow-sm d-flex flex-column">
+        
+        <!-- Image produit -->
+        <div style="height:200px;overflow:hidden;">
+          <img src="{% if p.image_url %}{{ p.image_url }}{% else %}{% static 'img/placeholder.png' %}{% endif %}" 
+               alt="{{ p.name }}" 
+               class="card-img-top"
+               style="width:100%;height:100%;object-fit:cover;">
+        </div>
+
+        <!-- Infos produit -->
+        <div class="card-body d-flex flex-column">
+          <h5 class="card-title text-truncate">{{ p.name }}</h5>
+          <p class="card-text fw-bold text-success mb-2">{{ p.price }} FCFA</p>
+          
+          <div class="mt-auto">
+            <a href="{% url 'product_detail' p.slug %}" class="btn btn-outline-primary w-100 mb-2">
+              Voir détails
+            </a>
+            <form action="{% url 'add_to_cart' p.id %}" method="post">
+              {% csrf_token %}
+              <button type="submit" class="btn btn-success w-100">
+                <i class="fa fa-cart-plus"></i> Ajouter au panier
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+    {% empty %}
+    <div class="col-12">
+      <p class="text-center">😔 Aucun produit disponible pour le moment.</p>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+
+{% endblock %}

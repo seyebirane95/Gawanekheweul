@@ -1,0 +1,88 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Paiement après livraison - Ma Boutique{% endblock %}
+
+{% block content %}
+<h1 class="mb-4">🚚 Paiement après livraison</h1>
+
+{% if cart %}
+<form method="post" class="shadow p-4 rounded bg-light">
+  {% csrf_token %}
+
+  <fieldset class="mb-4">
+    <legend class="fw-bold mb-3">📝 Vos informations</legend>
+
+    <div class="mb-3">
+      <label for="first_name" class="form-label">Prénom :</label>
+      <input type="text" name="first_name" id="first_name" class="form-control" required>
+    </div>
+
+    <div class="mb-3">
+      <label for="last_name" class="form-label">Nom :</label>
+      <input type="text" name="last_name" id="last_name" class="form-control" required>
+    </div>
+
+    <div class="mb-3">
+      <label for="address" class="form-label">Adresse :</label>
+      <input type="text" name="address" id="address" class="form-control" required>
+    </div>
+
+    <div class="mb-3">
+      <label for="phone" class="form-label">Téléphone :</label>
+      <input type="text" name="phone" id="phone" class="form-control" required>
+    </div>
+
+    <div class="mb-3">
+      <label for="email" class="form-label">Email :</label>
+      <input type="email" name="email" id="email" class="form-control" required>
+    </div>
+  </fieldset>
+
+  <h2 class="mt-4 mb-3">🛒 Votre panier</h2>
+
+  <div class="table-responsive">
+    <table class="table table-bordered text-center align-middle">
+      <thead class="table-light">
+        <tr>
+          <th>Produit</th>
+          <th>Qté</th>
+          <th>Prix unitaire</th>
+          <th>Sous-total</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for item in cart.values %}
+        <tr>
+          <td class="fw-bold">{{ item.name }}</td>
+          <td>{{ item.qty }}</td>
+          <td>{{ item.price }} FCFA</td>
+          <td class="text-success fw-bold">{{ item.qty|floatformat:0|add:""|cut:""|floatformat:0 }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <p class="fs-5 text-end mt-3">
+    <strong>Total : <span class="text-success">{{ total }} FCFA</span></strong>
+  </p>
+
+  <div class="text-center mt-4">
+    <button type="submit" class="btn btn-success btn-lg">
+      ✅ Valider ma commande
+    </button>
+  </div>
+</form>
+
+{% else %}
+<div class="alert alert-info text-center">
+  Votre panier est vide 😔
+</div>
+<div class="text-center mt-3">
+  <a href="{% url 'product_list' %}" class="btn btn-primary">
+    Retour aux produits
+  </a>
+</div>
+{% endif %}
+{% endblock %}

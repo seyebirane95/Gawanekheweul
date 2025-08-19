@@ -1,0 +1,4 @@
+:root { --spacing: 1rem; }
+.grid { display: grid; grid-template-columns: repeat(auto-fill,minmax(220px,1fr)); gap: var(--spacing); }
+img { border-radius: 12px; }
+nav ul { align-items: center; }

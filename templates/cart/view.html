@@ -1,0 +1,66 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Votre panier{% endblock %}
+
+{% block content %}
+<h1 class="mb-4">🛒 Votre panier</h1>
+
+{% if cart %}
+<div class="table-responsive">
+  <table class="table table-bordered align-middle text-center shadow-sm">
+    <thead class="table-light">
+      <tr>
+        <th>Produit</th>
+        <th>Prix</th>
+        <th>Qté</th>
+        <th>Sous-total</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for pid, item in cart.items %}
+      <tr>
+        <td class="fw-bold">{{ item.name }}</td>
+        <td>{{ item.price }} FCFA</td>
+        <td>
+          <form action="{% url 'update_quantity' pid %}" method="post" class="d-flex justify-content-center gap-2">
+            {% csrf_token %}
+            <input type="number" name="qty" value="{{ item.qty }}" min="1" class="form-control form-control-sm text-center" style="width:80px">
+            <button type="submit" class="btn btn-sm btn-outline-primary">🔄 Mettre à jour</button>
+          </form>
+        </td>
+        <td class="fw-bold text-success">{{ item.qty|floatformat:0|add:""|cut:""|floatformat:0 }}</td>
+        <td>
+          <a href="{% url 'remove_from_cart' pid %}" class="btn btn-sm btn-danger">
+            ❌ Retirer
+          </a>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+<div class="mt-4 text-end">
+  <h4>Total estimé : <span class="text-success fw-bold">{{ cart_total_price }} FCFA</span></h4>
+</div>
+
+<div class="d-flex flex-wrap gap-3 mt-3">
+  <a href="{% url 'checkout' %}" class="btn btn-success flex-fill">
+    ✅ Passer au paiement
+  </a>
+  <a href="{% url 'pay_on_livraison' %}" class="btn btn-warning flex-fill">
+    🚚 Payer à la livraison
+  </a>
+  <a href="{% url 'clear_cart' %}" class="btn btn-outline-danger flex-fill">
+    🗑️ Vider le panier
+  </a>
+</div>
+
+{% else %}
+<div class="alert alert-info text-center">
+  Votre panier est vide 😔
+</div>
+{% endif %}
+{% endblock %}

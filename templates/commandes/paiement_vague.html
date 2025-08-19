@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Paiement Wave{% endblock %}
+
+{% block content %}
+<div class="text-center my-5">
+
+  <h1 class="mb-4">📲 Paiement via Wave</h1>
+  <p class="lead">Scannez le QR code avec votre application <strong>Wave</strong> pour régler votre commande.</p>
+
+  <div class="card shadow mx-auto my-4" style="max-width: 400px;">
+    <div class="card-body">
+      <img src="{% static 'img/wave_qrc.webp' %}" 
+           alt="QR Code Wave" 
+           class="img-fluid rounded" 
+           style="max-width: 300px;">
+    </div>
+  </div>
+
+  <p class="mb-4">Une fois le paiement effectué, confirmez en cliquant ci-dessous :</p>
+
+  <form method="post" class="d-inline-block">
+    {% csrf_token %}
+    <button type="submit" class="btn btn-warning btn-lg px-4">
+      ✅ J'ai payé
+    </button>
+  </form>
+
+  <div class="mt-4 text-muted small">
+    🔒 Paiement 100% sécurisé via l'application Wave
+  </div>
+
+</div>
+{% endblock %}
