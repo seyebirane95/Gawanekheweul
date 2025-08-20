@@ -49,43 +49,35 @@ def view_cart(request):
 # --- Checkout classique ---
 def checkout(request):
     cart = request.session.get('cart', {})
-    if not cart:
-        messages.info(request, "Votre panier est vide.")
-        return redirect('view_cart')
+    total = sum(item['price'] * item['qty'] for item in cart.values())
 
-    if request.method == 'POST':
-        # récupérer les infos client
-        request.session['customer_info'] = {
-            'email': request.POST.get('email'),
-            'first_name': request.POST.get('first_name'),
-            'last_name': request.POST.get('last_name'),
-            'address': request.POST.get('address'),
-            'phone': request.POST.get('phone'),
-        }
-        # Rediriger vers la page QR code Wave
-        return redirect('wave_payment')
-    total = sum(item['qty'] * item['price'] for item in cart.values())
-    return render(request, 'orders/checkout.html', {'cart': cart, 'total': total})
+    if request.method == "POST":
+        # récupérer infos du formulaire
+        first_name = request.POST.get('first_name')
+        last_name = request.POST.get('last_name')
+        address = request.POST.get('address')
+        phone = request.POST.get('phone')
+        email = request.POST.get('email')
 
-def wave_payment(request):
-    cart = request.session.get('cart', {})
-    customer_info = request.session.get('customer_info', {})
+        if not cart:
+            messages.error(request, "Votre panier est vide.")
+            return redirect('product_list')
 
-    if not cart or not customer_info:
-        messages.info(request, "Votre panier est vide ou les informations client manquent.")
-        return redirect('view_cart')
+        # Calculer total_amount
+        total_amount = sum(item['price'] * item['qty'] for item in cart.values())
 
-    if request.method == 'POST':
-        # Ici, le client confirme qu'il a payé
-        # Crée la commande
+        # Créer la commande
         order = Order.objects.create(
-            email=customer_info['email'],
-            first_name=customer_info['first_name'],
-            last_name=customer_info['last_name'],
-            address=customer_info['address'],
-            phone=customer_info['phone'],
-            total_amount=sum(item['qty']*float(item['price']) for item in cart.values())
+            first_name=first_name,
+            last_name=last_name,
+            address=address,
+            phone=phone,
+            email=email,
+            payment_method="qr_code",
+            total_amount=total_amount
         )
+
+        # Créer les items
         for pid, item in cart.items():
             OrderItem.objects.create(
                 order=order,
@@ -94,17 +86,45 @@ def wave_payment(request):
                 price=item['price']
             )
 
+        # vider le panier
+        request.session['cart'] = {}
+        request.session.modified = True
+
+        # rediriger vers le paiement QR code
+        return redirect('wave_payment', order_id=order.id)
+
+    return render(request, 'orders/checkout.html', {
+        'cart': cart,
+        'total': total
+    })
+
+
+from django.shortcuts import render, get_object_or_404, redirect
+from django.contrib import messages
+from .models import Order, OrderItem
+
+def wave_payment(request, order_id):
+    order = get_object_or_404(Order, id=order_id)
+
+    if request.method == 'POST':
+        # Ici, le client confirme qu'il a payé
+        order.payment_status = "paid"  # On marque la commande comme payée
+        order.save()
+
         # Vider le panier
         request.session['cart'] = {}
         request.session.modified = True
 
+        # Rediriger vers page de succès
         return redirect('success')
 
     qr_code_url = '/static/img/wave_qr.png'
     return render(request, 'commandes/paiement_vague.html', {
-        'cart': cart,
+        'order': order,
         'qr_code_url': qr_code_url
     })
+
+
 
 # --- Paiement après livraison ---
 def pay_on_delivery(request):
@@ -165,26 +185,47 @@ def success(request):
 
 def pay_on_livraison(request):
     cart = request.session.get('cart', {})
-    
+
     if not cart:
         messages.info(request, "Votre panier est vide.")
         return redirect('view_cart')
 
-    total = sum(item['qty'] * item['price'] for item in cart.values())
+    total = sum(item['qty'] * float(item['price']) for item in cart.values())
 
     if request.method == "POST":
-        # Récupérer les infos du formulaire
+        # récupérer infos du formulaire
         first_name = request.POST.get('first_name')
         last_name = request.POST.get('last_name')
         email = request.POST.get('email')
         address = request.POST.get('address')
         phone = request.POST.get('phone')
 
-        # Ici tu pourrais créer une instance Order si tu as un modèle Order
-        # Pour l'instant on simule juste la validation
-        request.session['cart'] = {}  # vider le panier
+        # créer la commande
+        order = Order.objects.create(
+            first_name=first_name,
+            last_name=last_name,
+            email=email,
+            address=address,
+            phone=phone,
+            payment_method="cash",  # paiement à la livraison
+            payment_status="pending",  # pas encore payé
+            total_amount=total
+        )
+
+        # ajouter les produits commandés
+        for pid, item in cart.items():
+            OrderItem.objects.create(
+                order=order,
+                product_id=int(pid),
+                quantity=item['qty'],
+                price=item['price']
+            )
+
+        # vider le panier
+        request.session['cart'] = {}
         request.session.modified = True
 
+        # rediriger vers page succès
         return redirect('success')
 
     return render(request, 'orders/pay_on_delivery.html', {
