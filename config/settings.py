@@ -7,7 +7,9 @@ import environ
 env = environ.Env()
 environ.Env.read_env()  # charge le .env
 
-
+ADMIN_SITE_HEADER = "Administrateur Gawane Kheweul Boutique"
+ADMIN_SITE_TITLE = "Gawane Kheweul Business Admin"
+ADMIN_INDEX_TITLE = "Bienvenue dans l’espace d’administration de votre  boutique Gawane Kheweul"
 # ------------------------------
 # BASE & ENV
 # ------------------------------

@@ -3,6 +3,14 @@ from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
 from orders.views import pay_on_delivery, pay_on_livraison 
+from django.contrib import admin
+from django.conf import settings
+
+# Personnalisation dynamique
+admin.site.site_header = getattr(settings, "ADMIN_SITE_HEADER", "Django Administration")
+admin.site.site_title = getattr(settings, "ADMIN_SITE_TITLE", "Admin")
+admin.site.index_title = getattr(settings, "ADMIN_INDEX_TITLE", "Bienvenue")
+
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('core.urls')),
